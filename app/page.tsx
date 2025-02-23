@@ -20,14 +20,24 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
+import { getWorkPermit, QueryResponseType } from "@/lib/serveractions";
+import axios from "axios";
+type ResponseType = {
+  success: boolean;
+  message?:string;
+  data?:QueryResponseType;
+}
 
 export default function Page() {
+  const [data, setData] = useState<QueryResponseType|null>(null);
   const [basvuruSecimi, setBasvuruSecimi] = useState("");
   const [belgeNo, setBelgeNo] = useState("");
   const [yabanciKimlikNo, setYabanciKimlikNo] = useState("");
-  const [captcha, setCaptcha] = useState(false);
+  const [captchaIsOk, setCaptchaIsOk] = useState(false);
+  const [recaptchaToken, setCaptchaToken] = useState<string | null>(null);
+  console.log("gelen data",data)
+
 
   const captchaRef = useRef(null);
 
@@ -43,36 +53,66 @@ export default function Page() {
     }
   };
 
-  const handleCaptchaChange = async (token) => {
+  const handleCaptchaSubmission = async (token) => {
     try {
-      const response = await fetch(
-        `https://www.google.com/recaptcha/api/siteverify?secret=6Lfnmd8qAAAAAMTBzN7bf4JZi2N8gFZFRQxyHY4W&response=${token}`,
-        {
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
-          },
-          method: "POST",
-        }
-      );
-      const responseJson = await response.json();
-      if (responseJson.success) {
-        console.log(captcha);
-        setCaptcha(true);
+      const response = await fetch("/api/captcha", {
+        method: "POST",
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ token }),
+      });
+      if (response.status === 200) {
+        setCaptchaIsOk(true);
+        setCaptchaToken(token)
+        
       }
     } catch (error) {
       console.log(error);
     }
   };
 
-  // const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-  //   e.preventDefault()
-  //   try {
-  //     const response = await fetch("/api/")
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    // try {
+    //   const response: ResponseType = await axios.get("/api/work-permit",{params:{basvuruSecimi,belgeNo,yabanciKimlikNo,recaptchaToken: recaptchaToken}});
+      
+    
+    //   if (response.success) {
+    //    setData(response.data!);
+    //   }
 
-  //   } catch (error) {
+    // } catch (error) {
+    //   console.log(error)
+    // }
 
-  //   }
-  // }
+    try {
+      const response = await axios.get(
+        `https://ecalismaizni.csgb.gov.tr/api/izinSorgula/basvuruDTO?basvuruSecimi=${basvuruSecimi}&belgeNo=${belgeNo}&yabanciKimlikNo=${yabanciKimlikNo}&recaptchaToken=${recaptchaToken}`,
+       {baseURL:"https://izinsorgula.csgb.gov.tr/"}
+      );
+  
+      if (!response.data) {
+        throw new Error('Failed to fetch data');
+      }
+  
+      const data = await response.data.json();
+      
+    } catch (error) {
+      
+    }
+  }
+
+
+
+  const handleCatpchaChange = (token: string | null) => {
+    handleCaptchaSubmission(token);
+  };
+
+  function handleExpired() {
+    setCaptchaIsOk(false);
+  }
 
   return (
     <div className="flex  w-full items-center justify-center p-6 md:p-10 ">
@@ -87,7 +127,7 @@ export default function Page() {
               <Separator />
             </CardHeader>
             <CardContent>
-              <form>
+              <form onSubmit={handleSubmit}>
                 <div className="flex flex-col gap-6">
                   <div className="grid gap-2">
                     <Label htmlFor="email">Başvuru Türü</Label>
@@ -99,7 +139,7 @@ export default function Page() {
                         <SelectValue placeholder="Seçin" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="1">Çalışma İzni - e-İzin</SelectItem>
+                        <SelectItem value="0">Çalışma İzni - e-İzin</SelectItem>
                         <SelectItem value="2">
                           Çalışma İzni Muafiyeti - e-Muafiyet
                         </SelectItem>
@@ -113,13 +153,13 @@ export default function Page() {
                         Yabancı Kimlik / Referans Numarası
                       </Label>
                     </div>
-                    <Input name="yabanciKimlikNo" type="text" required />
+                    <Input name="yabanciKimlikNo" type="text" required onChange={handleChange} />
                   </div>
                   <div className="grid gap-2">
                     <div className="flex items-center">
                       <Label htmlFor="belgeNo">Başvuru Numarası</Label>
                     </div>
-                    <Input name="belgeNo" type="text" required />
+                    <Input name="belgeNo" type="text" required  onChange={handleChange}/>
                   </div>
                   <div className="grid gap-2">
                     <div className="flex items-center justify-center">
@@ -127,12 +167,13 @@ export default function Page() {
                         className="transform scale-110"
                         ref={captchaRef}
                         sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
-                        onChange={handleCaptchaChange}
+                        onChange={handleCatpchaChange}
+                        onExpired={handleExpired}
                       />
                     </div>
                   </div>
                   <Separator />
-                  <Button type="submit" className="w-full">
+                  <Button  type="submit" className="w-full">
                     Sorgula
                   </Button>
                   <Button type="reset" variant="outline" className="w-full">
@@ -145,86 +186,6 @@ export default function Page() {
         </div>
       </div>
     </div>
-    // <div className="min-h-screen bg-indigo-200">
-    //   <div className="grid place-items-center bg-[#F5F5F5] py-14 gap-5">
-    //     <div className="relative">
-    //       <div className="isolate aspect-video w-[25rem] sm:w-[35rem] md:w-[50rem] lg:w-[65rem] rounded-xl bg-white shadow-lg ring-1 ring-black/5">
-    //         <h1 className="text-base  text-[#DC0D15] p-2 text-center font-semibold">
-    //           Yabancıların Çalışma İzni, Çalışma İzni Muafiyeti ve Turkuaz Kart
-    //           Bilgisi Sorgulama Sistemi
-    //         </h1>
-    //         <Separator />
-    //         <div className=" w-full rounded-lg py-3 " />
-
-    //         <form className="flex flex-col md:px-24 px-8 py-2 gap-3">
-    //           <div className="flex flex-col  md:flex-row md:items-center md:justify-between gap-2  items-start ">
-    //             <Label className="font-medium text-base pl-3">
-    //               Başvuru Türü
-    //             </Label>
-    //             <Select onValueChange={handleSelectChange} name="basvuruSecimi">
-    //               <SelectTrigger className="flex items-center h-9 w-full md:w-[300px] lg:w-[500px] rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm">
-    //                 <SelectValue placeholder="Seçin" />
-    //               </SelectTrigger>
-    //               <SelectContent>
-    //                 <SelectItem value="1">Çalışma İzni - e-İzin</SelectItem>
-    //                 <SelectItem value="2">
-    //                   Çalışma İzni Muafiyeti - e-Muafiyet
-    //                 </SelectItem>
-    //                 <SelectItem value="3">Turkuaz Kart</SelectItem>
-    //               </SelectContent>
-    //             </Select>
-    //           </div>
-    //           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2  items-start">
-    //             <Label className="font-medium text-base pl-3">
-    //               Yabancı Kimlik / Referans Numarası
-    //             </Label>
-    //             <Input
-    //               onChange={handleChange}
-    //               name="yabanciKimlikNo"
-    //               className="md:w-[300px] lg:w-[500px]"
-    //             />
-    //           </div>
-    //           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2  items-start">
-    //             <Label className="font-medium text-base pl-3">
-    //               Başvuru Numarası
-    //             </Label>
-    //             <Input
-    //               onChange={handleChange}
-    //               name="belgeNo"
-    //               className="md:w-[300px] lg:w-[500px]"
-    //             />
-    //           </div>
-    //           <div className="flex items-center justify-center ">
-    //             <ReCAPTCHA
-    //             className="transform scale-110"
-
-    //               ref={captchaRef}
-    //               sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
-    //               onChange={handleCaptchaChange}
-    //             />
-    //           </div>
-
-    //           <div className="flex flex-col md:flex-row justify-between md:w-[300px] lg:w-[500px] md:mx-[308px] lg:mx-[350px] gap-3">
-    //             <Button
-    //               type="submit"
-    //               disabled={!captcha}
-    //               variant="outline"
-    //               className="w-full md:w-36 lg:w-56"
-    //             >
-    //               Sorgula
-    //             </Button>
-    //             <Button
-    //               type="reset"
-    //               variant="secondary"
-    //               className="w-full md:w-36 lg:w-56"
-    //             >
-    //               Temizle
-    //             </Button>
-    //           </div>
-    //         </form>
-    //       </div>
-    //     </div>
-    //   </div>
-    // </div>
+   
   );
 }
