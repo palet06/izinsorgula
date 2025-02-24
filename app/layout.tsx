@@ -23,9 +23,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <meta name="referrer" content="unsafe-url"></meta>
+    
       <body
-        className={`${rubikFont.className}  antialiased bg-[#F5F5F5]`}
+        className={`${rubikFont.className}  antialiased bg-white`}
       >
         <Navbar />
         {children}
