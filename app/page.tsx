@@ -38,6 +38,17 @@ export default function Page() {
   const [recaptchaToken, setCaptchaToken] = useState<string | null>(null);
   console.log("gelen data",data)
 
+  const authAxios = axios.create({
+    baseURL: "https://izinsorgula.csgb.gov.tr", //YOUR_API_URL HERE
+    headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': 'https://izinsorgula.csgb.gov.tr',
+        'Referer':'https://izinsorgula.csgb.gov.tr',
+        'Access-Control-Allow-Headers': 'access-control-allow-headers,access-control-allow-methods,access-control-allow-origin',
+        
+    },
+});
+
 
   const captchaRef = useRef(null);
 
@@ -54,6 +65,7 @@ export default function Page() {
   };
 
   const handleCaptchaSubmission = async (token) => {
+    setCaptchaToken(token);
     try {
       const response = await fetch("/api/captcha", {
         method: "POST",
@@ -88,9 +100,9 @@ export default function Page() {
     // }
 
     try {
-      const response = await axios.get(
+      const response = await authAxios.get(
         `https://ecalismaizni.csgb.gov.tr/api/izinSorgula/basvuruDTO?basvuruSecimi=${basvuruSecimi}&belgeNo=${belgeNo}&yabanciKimlikNo=${yabanciKimlikNo}&recaptchaToken=${recaptchaToken}`,
-       {baseURL:"https://izinsorgula.csgb.gov.tr/"}
+       
       );
   
       if (!response.data) {
@@ -107,12 +119,16 @@ export default function Page() {
 
 
   const handleCatpchaChange = (token: string | null) => {
+    
+    
     handleCaptchaSubmission(token);
   };
 
   function handleExpired() {
     setCaptchaIsOk(false);
   }
+
+  console.log(process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY)
 
   return (
     <div className="flex  w-full items-center justify-center p-6 md:p-10 ">
