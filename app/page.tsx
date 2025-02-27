@@ -24,13 +24,24 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { QueryResponseType } from "@/lib/serveractions";
+import {
+  QueryResponseType,
+  QueryResponseTypeExemption,
+} from "@/lib/serveractions";
 import axios from "axios";
 import Image from "next/image";
+import { ArrowLeft } from "lucide-react";
+import WorkPermitInfo from "@/components/appcomponents/WorkPermitInfo";
+import WorkPermitExemption from "@/components/appcomponents/WorkPermitExemption";
 
 export default function Page() {
   const [params] = useUrlSearchParams();
-  const [data, setData] = useState<QueryResponseType | null>(null);
+  const [belgeNoControl, setBelgeNoControl] = useState(false);
+  const [workPermitExemptionData,setWorkPermitExemptionData] = useState< QueryResponseTypeExemption | null>(null);
+  const [data, setData] = useState<
+    QueryResponseType  | null
+  >(null);
+  const [hasResult, setHasResult] = useState(false);
   const [basvuruSecimi, setBasvuruSecimi] = useState<string>("");
   const [belgeNo, setBelgeNo] = useState("");
   const [yabanciKimlikNo, setYabanciKimlikNo] = useState("");
@@ -45,10 +56,32 @@ export default function Page() {
     setYabanciKimlikNo((params.yabanciKimlikNo || "").toString());
   }, [params]);
 
+  const disabledBasvuruNoList = ["1", "2", "6"];
   const captchaRef = useRef(null);
+  const clearForm = () => {
+    setBasvuruSecimi("");
+    setBelgeNo("");
+    setYabanciKimlikNo("");
+    setCaptchaIsOk(false);
+    if (captchaRef.current) {
+      captchaRef.current.reset();
+    }
+
+    setCaptchaToken(null);
+    setData(null);
+    setWorkPermitExemptionData(null)
+    setHasResult(false); //burayı false yap
+    setBelgeNoControl(false);
+  };
 
   const handleSelectChange = (name) => {
     setBasvuruSecimi(name);
+    if (disabledBasvuruNoList.includes(name)) {
+      console.log("belgeno disabled true yapılıyor", basvuruSecimi);
+      setBelgeNoControl(true);
+    } else {
+      setBelgeNoControl(false);
+    }
   };
 
   const handleChange = ({ target: { name, value } }) => {
@@ -62,20 +95,38 @@ export default function Page() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    try {
-      const response = await axios.get(
-        `${process.env
-          .NEXT_PUBLIC_REMOTE_SERVER!}/api/izinSorgula/basvuruDTO?basvuruSecimi=${basvuruSecimi}&belgeNo=${belgeNo}&yabanciKimlikNo=${yabanciKimlikNo}&recaptchaToken=${recaptchaToken}`
-      );
-
-      if (!response.data) {
-        throw new Error("Failed to fetch data");
-      }
-
-      setData(response.data);
-    } catch (error) {
-      console.log(error);
+    if (basvuruSecimi === "5") {
+      axios
+        .get(
+          `https://emuafiyetapi.csgb.gov.tr/verifyExemption?belgeNo=${belgeNo}&ykn=${yabanciKimlikNo}`
+        )
+        .then((response) => {
+          if (!response.data.data) {
+            console.log("Kayıt bulunamadı."); //toast yap
+          } else {
+            console.log("Kayıt bulundu."); //toast yap
+            console.log(response.data.data)
+            setWorkPermitExemptionData(response.data.data as QueryResponseTypeExemption);
+            setHasResult(true);
+          }
+        });
     }
+
+    // try {
+    //   const response = await axios.get(
+    //     `${process.env
+    //       .NEXT_PUBLIC_REMOTE_SERVER!}/api/izinSorgula/basvuruDTO?basvuruSecimi=${basvuruSecimi}&belgeNo=${belgeNo}&yabanciKimlikNo=${yabanciKimlikNo}&recaptchaToken=${recaptchaToken}`
+    //   );
+
+    //   if (!response.data) {
+    //     throw new Error("Veri alınamadı");
+    //   }
+
+    //   setData(response.data);
+    //   setHasResult(true);
+    // } catch (error) {
+    //   console.log(error);
+    // }
   };
 
   const handleCatpchaChange = (token: string | null) => {
@@ -91,7 +142,7 @@ export default function Page() {
 
   return (
     <>
-      {!data && (
+      {!hasResult && (
         <div className="flex  w-full items-center justify-center p-6 md:p-10 ">
           <div className="w-full max-w-sm  shadow-lg ">
             <div className={cn("flex flex-col gap-6 ")}>
@@ -107,16 +158,19 @@ export default function Page() {
                   <form onSubmit={handleSubmit}>
                     <div className="flex flex-col gap-6">
                       <div className="grid gap-2">
-                        <Label htmlFor="email">Başvuru Türü</Label>
+                        <Label htmlFor="basvuruSecimi">Başvuru Türü</Label>
                         <Select
+                          key={basvuruSecimi.toString()}
                           onValueChange={handleSelectChange}
                           name="basvuruSecimi"
-                          key={basvuruSecimi}
                           value={basvuruSecimi.toString()}
                           required
                         >
-                          <SelectTrigger className="bg-white flex items-center h-9 w-full  rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 ">
-                            <SelectValue placeholder="Seçin" />
+                          <SelectTrigger className="bg-white text-left  flex items-center h-9 w-full  rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 ">
+                            <SelectValue
+                              className="text-left"
+                              placeholder="İzin Türü Seçiniz"
+                            />
                           </SelectTrigger>
 
                           <SelectContent className="!bg-white">
@@ -126,7 +180,14 @@ export default function Page() {
                             <SelectItem value="5">
                               Çalışma İzni Muafiyeti - e-Muafiyet
                             </SelectItem>
+                            <SelectItem value="2">Serbest Bölge</SelectItem>
+                            <SelectItem value="1">
+                              GK/UK - Mevsimlik Tarım ve Hayvancılık Muafiyeti
+                            </SelectItem>
                             <SelectItem value="4">Turkuaz Kart</SelectItem>
+                            <SelectItem value="6">
+                              Muafiyet Bilgi Formu
+                            </SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -150,11 +211,12 @@ export default function Page() {
                           <Label htmlFor="belgeNo">Başvuru Numarası</Label>
                         </div>
                         <Input
+                          disabled={belgeNoControl}
                           className="bg-white"
                           value={belgeNo}
                           name="belgeNo"
                           type="text"
-                          required
+                          required={!belgeNoControl}
                           onChange={handleChange}
                         />
                       </div>
@@ -179,7 +241,12 @@ export default function Page() {
                       >
                         Sorgula
                       </Button>
-                      <Button type="reset" variant="outline" className="w-full">
+                      <Button
+                        onClick={() => clearForm()}
+                        type="reset"
+                        variant="outline"
+                        className="w-full"
+                      >
                         Temizle
                       </Button>
                     </div>
@@ -191,175 +258,60 @@ export default function Page() {
         </div>
       )}
 
-      {data && (
+      {data && !belgeNoControl  && 
         <div className=" min-h-screen bg-white p-4 md:p-8 gap-5">
-          <Card className="mx-auto max-w-4xl overflow-hidden bg-[#F5F5F5] shadow-lg">
-            <div className="p-6 md:p-8">
-              {/* Header Section */}
-              <div className="flex flex-col gap-6 items-center md:items-start md:flex-row">
-                <div className="shrink-0">
-                  <Image
-                    src={data.fotograf?`data:image/jpeg;base64,${data.fotograf}`:"avatar.svg" 
-                      
-                      }
-                    alt="Profile"
-                    width={120}
-                    height={120}
-                    className="rounded-lg"
-                  />
-                </div>
-                <div className="flex-1 space-y-4">
-                  <div className="flex items-start justify-center md:justify-between">
-                    <div>
-                      <h1 className="text-2xl font-bold">
-                        {data.ad} {data.soyad}
-                      </h1>
-                      <p className="text-muted-foreground text-sm">
-                        <span className="font-semibold text-black">
-                          Yabancı Kimlik Numarası :
-                        </span>{" "}
-                        {data.tcYabKimlikNo}
-                      </p>
-                    </div>
-                  </div>
-                  <Separator />
-
-                  <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground place-items-end md:place-items-start">
-                    <div className="col-span-1 grid grid-cols-1 gap-2 md:grid-cols-2 ">
-                      <div className="col-span-2">
-                        <span className="font-semibold text-black">
-                          Doğum Tarihi :
-                        </span>
-                        {(data.dogumTarihi &&
-                          format(data.dogumTarihi, "dd.MM.yyyy")) ||
-                          "-"}
-                      </div>
-                      <div className="col-span-2">
-                        <span className="font-semibold text-black">
-                          Uyruk :
-                        </span>{" "}
-                        {data.uyruk}
-                      </div>
-                    </div>
-                    <div className="col-span-1 grid grid-cols-1 gap-2 md:grid-cols-2">
-                      <div className="col-span-2">
-                        <span className="font-semibold text-black">
-                          Baba Adı :
-                        </span>{" "}
-                        {data.babaAdi}
-                      </div>
-                      <div className="col-span-2">
-                        <span className="font-semibold text-black">
-                          Ana Adı :
-                        </span>{" "}
-                        {data.anaAdi}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="mx-auto max-w-4xl overflow-hidden bg-[#F5F5F5] shadow-lg mt-5">
-            <CardHeader>
-              <CardTitle className="text-xl text-center">
-                Çalışma İzni Bilgileri
-              </CardTitle>
-            </CardHeader>
-            <Separator />
-            <CardContent className="mt-5">
-              <div className="grid gap-4">
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="font-semibold">Çalışma İzni Türü</div>
-                  <div>{data.izinTuru || "-"}</div>
-                </div>
-                <Separator />
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="font-semibold">Veriliş Tarihi</div>
-                  <div>
-                    {(data.verilisTarihi &&
-                      format(data.verilisTarihi, "dd.MM.yyyy")) ||
-                      "-"}{" "}
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="font-semibold">İzin Başlangıç Tarihi</div>
-                  <div>
-                    {(data.izinBasTarihi &&
-                      format(data.izinBasTarihi, "dd.MM.yyyy")) ||
-                      "-"}
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="font-semibold">İzin Bitiş Tarihi</div>
-                  <div>
-                    {(data.izinBitTarihi &&
-                      format(data.izinBitTarihi, "dd.MM.yyyy")) ||
-                      "-"}{" "}
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="font-semibold">İzin Sonlandırma Tarihi</div>
-                  <div>
-                    {(data.sonlandirmaTarihi &&
-                      format(data.sonlandirmaTarihi, "dd.MM.yyyy")) ||
-                      "-"}
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="font-semibold">İzin Geçerlilik Durum</div>
-                  <div
-                    className={`${
-                      data.izingecerlilikdurum.includes("Değerlendirme") &&
-                      "text-yellow-700"
-                    } ${
-                      data.izingecerlilikdurum.includes("Sonlan") &&
-                      "text-[#DC0D15]"
-                    }`}
-                  >
-                    {data.izingecerlilikdurum}
-                  </div>
-                </div>
-                <Separator />
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="font-semibold">İşyeri Unvanı</div>
-                  <div>{data.adUnvan || "-"}</div>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="font-semibold">Yabancının Çalışma Adresi</div>
-                  <div>{data.sirketAdres || "-"}</div>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="font-semibold">Görev</div>
-                  <div>{data.gorev || "-"}</div>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="font-semibold">Maaş</div>
-                  <div>{(data.ucret && data.ucret) || "-"}</div>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="font-semibold">Şerhler</div>
-                  <div>
-                    {(data.serhListesi.length > 0 && (
-                      <ul>
-                        {data.serhListesi.map((serh, i) => (
-                          <li key={i}>{serh}</li>
-                        ))}
-                      </ul>
-                    )) ||
-                      "-"}
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="mx-auto max-w-4xl">
+            <Button
+              onClick={() => {
+                setHasResult(false);
+                clearForm();
+              }}
+              variant="ghost"
+              className="mb-4"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Yeni Sorgulama
+            </Button>
+          </div>
+          <WorkPermitInfo data={data as QueryResponseType} />
         </div>
-      )}
+      }
+
+      {workPermitExemptionData && !belgeNoControl && 
+        <div className=" min-h-screen bg-white p-4 md:p-8 gap-5">
+          <div className="mx-auto max-w-4xl">
+            <Button
+              onClick={() => {
+                setHasResult(false);
+                clearForm();
+              }}
+              variant="ghost"
+              className="mb-4"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Yeni Sorgulama
+            </Button>
+          </div>
+          <WorkPermitExemption data={workPermitExemptionData as QueryResponseTypeExemption} />
+        </div>
+      }
       {/* <div className=" min-h-screen bg-white p-4 md:p-8 gap-5">
+        <div className="mx-auto max-w-4xl">
+          <Button
+            onClick={() => {
+              setHasResult(true);
+              clearForm();
+            }}
+            variant="ghost"
+            className="mb-4"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Yeni Sorgulama
+          </Button>
+        </div>
+
         <Card className="mx-auto max-w-4xl overflow-hidden bg-[#F5F5F5] shadow-lg">
           <div className="p-6 md:p-8">
-            
             <div className="flex flex-col gap-6 items-center md:items-start md:flex-row">
               <div className="shrink-0">
                 <Image
@@ -382,6 +334,7 @@ export default function Page() {
                     </p>
                   </div>
                 </div>
+
                 <Separator />
 
                 <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground place-items-end md:place-items-start">

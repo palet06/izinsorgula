@@ -28,6 +28,30 @@ export interface QueryResponseType {
   serhListesi: any[]; // Bu alanın tipi daha spesifik olarak belirlenebilir
 } 
 
+export interface QueryResponseTypeExemption {
+  
+  
+    fotograf: string;
+    ad: string;
+    soyad: string;
+    anaAdi: string;
+    babaAdi: string;
+    uyruk: string;
+    dogumTarihi: string; 
+    ykn: string;
+    belgeNo: string;
+    muafiyetTuru: string;
+    baslangicTarihi: string; 
+    bitisTarihi: string; 
+    sonlandirmaTarihi: string 
+    gecerlilikDurumu: string;
+    isyeriUnvani: string;
+    calismaAdresi: string;
+    meslek: string;
+  
+};
+
+
 export const getWorkPermit = async (basvuruSecimi:string,belgeNo:string,yabanciKimlikNo:string) => {
   try {
     const response = await fetch(
