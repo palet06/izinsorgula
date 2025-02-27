@@ -2,12 +2,11 @@ import axios from 'axios';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const basvuruSecimi = searchParams.get('basvuruSecimi');
-  const belgeNo = searchParams.get('belgeNo');
-  const yabanciKimlikNo = searchParams.get('yabanciKimlikNo');
-  const recaptchaToken = searchParams.get('recaptchaToken');
+export async function POST(request: NextRequest) {
+  const data = await request.json();
+  const { basvuruSecimi, belgeNo, yabanciKimlikNo, recaptchaToken } = data;
+ 
+    console.log(basvuruSecimi,belgeNo,yabanciKimlikNo,recaptchaToken)
 
   if (!basvuruSecimi || !belgeNo || !yabanciKimlikNo) {
     return NextResponse.json(
@@ -18,8 +17,8 @@ export async function GET(request: NextRequest) {
 
   try {
     const response = await axios.get(
-      `https://ecalismaizni.csgb.gov.tr/api/izinSorgula/basvuruDTO?basvuruSecimi=${basvuruSecimi}&belgeNo=${belgeNo}&yabanciKimlikNo=${yabanciKimlikNo}&recaptchaToken=${recaptchaToken}`,
-     {baseURL:"https://izinsorgula.csgb.gov.tr/"}
+      `http://10.0.81.8:8282/api/izinSorgula/basvuruDTO?basvuruSecimi=${basvuruSecimi}&belgeNo=${belgeNo}&yabanciKimlikNo=${yabanciKimlikNo}&recaptchaToken=${recaptchaToken}`,
+     
     );
 
     if (!response.data) {
