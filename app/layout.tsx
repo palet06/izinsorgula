@@ -1,15 +1,17 @@
+
 import type { Metadata } from "next";
 import { Rubik } from "next/font/google";
 import "./globals.css";
-import { Navbar } from "@/components/appcomponents/Navbar";
-import { Footer } from "@/components/appcomponents/Footer";
+
+
+import AppWrapper from "@/components/appcomponents/AppWrapper";
+
+
 
 const rubikFont = Rubik({
   variable: "--font-rubik",
   subsets: ["latin"],
 });
-
-
 
 export const metadata: Metadata = {
   title: "Çalışma ve Sosyal Güvenlik Bakanlığı",
@@ -21,15 +23,13 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  
+
   return (
-    <html lang="en">
-    <meta name="referrer" content="unsafe-url"/>
-      <body
-        className={`${rubikFont.className}  antialiased bg-white`}
-      >
-        <Navbar />
-        {children}
-        <Footer />
+    <html lang="tr">
+    
+      <body className={`${rubikFont.className}  antialiased bg-white`}>
+        <AppWrapper>{children}</AppWrapper>
       </body>
     </html>
   );

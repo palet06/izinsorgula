@@ -19,8 +19,8 @@ const WorkPermitExemption = ({
             <div className="shrink-0">
               <Image
                 src={
-                  data.fotograf
-                    ? `data:image/jpeg;base64,${data.fotograf}`
+                  data.data.fotograf
+                    ? `data:image/jpeg;base64,${data.data.fotograf}`
                     : "avatar.svg"
                 }
                 alt="Profile"
@@ -33,13 +33,13 @@ const WorkPermitExemption = ({
               <div className="flex items-start justify-center md:justify-between">
                 <div>
                   <h1 className="text-2xl font-bold">
-                    {data.ad} {data.soyad}
+                    {data.data.ad} {data.data.soyad}
                   </h1>
                   <p className="text-muted-foreground text-sm">
                     <span className="font-semibold text-black">
                       Yabancı Kimlik Numarası :
                     </span>{" "}
-                    {data.ykn}
+                    {data.data.ykn}
                   </p>
                 </div>
               </div>
@@ -51,23 +51,23 @@ const WorkPermitExemption = ({
                     <span className="font-semibold text-black">
                       Doğum Tarihi :
                     </span>
-                    {(data.dogumTarihi &&
-                      format(data.dogumTarihi, "dd.MM.yyyy")) ||
+                    {(data.data.dogumTarihi &&
+                      format(data.data.dogumTarihi, "dd.MM.yyyy")) ||
                       "-"}
                   </div>
                   <div className="col-span-2">
                     <span className="font-semibold text-black">Uyruk :</span>{" "}
-                    {data.uyruk}
+                    {data.data.uyruk}
                   </div>
                 </div>
                 <div className="col-span-1 grid grid-cols-1 gap-2 md:grid-cols-2">
                   <div className="col-span-2">
                     <span className="font-semibold text-black">Baba Adı :</span>{" "}
-                    {data.babaAdi}
+                    {data.data.babaAdi}
                   </div>
                   <div className="col-span-2">
                     <span className="font-semibold text-black">Ana Adı :</span>{" "}
-                    {data.anaAdi}
+                    {data.data.anaAdi}
                   </div>
                 </div>
               </div>
@@ -87,52 +87,52 @@ const WorkPermitExemption = ({
           <div className="grid gap-4">
             <div className="grid grid-cols-2 gap-2">
               <div className="font-semibold">Başvuru Numarası</div>
-              <div>{data.belgeNo || "-"}</div>
+              <div>{data.data.belgeNo || "-"}</div>
             </div>
             <Separator />
             <div className="grid grid-cols-2 gap-2">
               <div className="font-semibold">Muafiyet Türü</div>
-              <div>{data.muafiyetTuru || "-"}</div>
+              <div>{data.data.muafiyetTuru || "-"}</div>
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div className="font-semibold">Başlangıç Tarihi</div>
               <div>
-                {(data.baslangicTarihi &&
-                  format(data.baslangicTarihi, "dd.MM.yyyy")) ||
+                {(data.data.baslangicTarihi &&
+                  format(data.data.baslangicTarihi, "dd.MM.yyyy")) ||
                   "-"}
               </div>
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div className="font-semibold">Bitiş Tarihi</div>
               <div>
-                {(data.bitisTarihi && format(data.bitisTarihi, "dd.MM.yyyy")) ||
+                {(data.data.bitisTarihi && format(data.data.bitisTarihi, "dd.MM.yyyy")) ||
                   "-"}{" "}
               </div>
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div className="font-semibold">Sonlandırma Tarihi</div>
               <div>
-                {(data.sonlandirmaTarihi &&
-                  format(data.sonlandirmaTarihi, "dd.MM.yyyy")) ||
+                {(data.data.sonlandirmaTarihi &&
+                  format(data.data.sonlandirmaTarihi, "dd.MM.yyyy")) ||
                   "-"}
               </div>
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div className="font-semibold">Geçerlilik Durumu</div>
-              <div>{data.gecerlilikDurumu}</div>
+              <div>{data.data.gecerlilikDurumu}</div>
             </div>
             <Separator />
             <div className="grid grid-cols-2 gap-2">
               <div className="font-semibold">İşyeri Unvanı</div>
-              <div>{data.isyeriUnvani || "-"}</div>
+              <div>{data.data.isyeriUnvani || "-"}</div>
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div className="font-semibold">Yabancının Çalışma Adresi</div>
-              <div>{data.calismaAdresi || "-"}</div>
+              <div>{data.data.calismaAdresi || "-"}</div>
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div className="font-semibold">Görev</div>
-              <div>{data.meslek || "-"}</div>
+              <div>{data.data.meslek || "-"}</div>
             </div>
           </div>
         </CardContent>
