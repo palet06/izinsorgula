@@ -37,10 +37,9 @@ import WorkPermitExemption from "@/components/appcomponents/WorkPermitExemption"
 export default function Page() {
   const [params] = useUrlSearchParams();
   const [belgeNoControl, setBelgeNoControl] = useState(false);
-  const [workPermitExemptionData,setWorkPermitExemptionData] = useState< QueryResponseTypeExemption | null>(null);
-  const [data, setData] = useState<
-    QueryResponseType  | null
-  >(null);
+  const [workPermitExemptionData, setWorkPermitExemptionData] =
+    useState<QueryResponseTypeExemption | null>(null);
+  const [data, setData] = useState<QueryResponseType | null>(null);
   const [hasResult, setHasResult] = useState(false);
   const [basvuruSecimi, setBasvuruSecimi] = useState<string>("");
   const [belgeNo, setBelgeNo] = useState("");
@@ -56,7 +55,7 @@ export default function Page() {
     setYabanciKimlikNo((params.yabanciKimlikNo || "").toString());
   }, [params]);
 
-  const disabledBasvuruNoList = ["1", "2", "6"];
+  const disabledBasvuruNoList = ["1", "2"];
   const captchaRef = useRef(null);
   const clearForm = () => {
     setBasvuruSecimi("");
@@ -69,7 +68,7 @@ export default function Page() {
 
     setCaptchaToken(null);
     setData(null);
-    setWorkPermitExemptionData(null)
+    setWorkPermitExemptionData(null);
     setHasResult(false); //burayı false yap
     setBelgeNoControl(false);
   };
@@ -94,6 +93,7 @@ export default function Page() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.log("submit e girdi başvuru seçimi", basvuruSecimi);
 
     if (basvuruSecimi === "5") {
       axios
@@ -105,28 +105,48 @@ export default function Page() {
             console.log("Kayıt bulunamadı."); //toast yap
           } else {
             console.log("Kayıt bulundu."); //toast yap
-            console.log(response.data.data)
-            setWorkPermitExemptionData(response.data.data as QueryResponseTypeExemption);
+            console.log(response.data.data);
+            setWorkPermitExemptionData(
+              response.data as QueryResponseTypeExemption
+            );
             setHasResult(true);
           }
         });
+    } else if (basvuruSecimi === "6") {
+      try {
+        const response = await axios.get(
+          `https://emuafiyetapi.csgb.gov.tr/verifyMb?belgeNo=${belgeNo}&ykn=${yabanciKimlikNo}`
+        );
+
+        if (!response.data) {
+          throw new Error("Veri alınamadı");
+        }
+        console.log(response);
+
+        setWorkPermitExemptionData(
+          response.data as QueryResponseTypeExemption
+        );
+        setHasResult(true);
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      try {
+        const response = await axios.get(
+          `${process.env
+            .NEXT_PUBLIC_REMOTE_SERVER!}/api/izinSorgula/basvuruDTO?basvuruSecimi=${basvuruSecimi}&belgeNo=${belgeNo}&yabanciKimlikNo=${yabanciKimlikNo}&recaptchaToken=${recaptchaToken}`
+        );
+
+        if (!response.data) {
+          throw new Error("Veri alınamadı");
+        }
+        console.log(response);
+        setData(response.data as QueryResponseType);
+        setHasResult(true);
+      } catch (error) {
+        console.log(error);
+      }
     }
-
-    // try {
-    //   const response = await axios.get(
-    //     `${process.env
-    //       .NEXT_PUBLIC_REMOTE_SERVER!}/api/izinSorgula/basvuruDTO?basvuruSecimi=${basvuruSecimi}&belgeNo=${belgeNo}&yabanciKimlikNo=${yabanciKimlikNo}&recaptchaToken=${recaptchaToken}`
-    //   );
-
-    //   if (!response.data) {
-    //     throw new Error("Veri alınamadı");
-    //   }
-
-    //   setData(response.data);
-    //   setHasResult(true);
-    // } catch (error) {
-    //   console.log(error);
-    // }
   };
 
   const handleCatpchaChange = (token: string | null) => {
@@ -258,7 +278,7 @@ export default function Page() {
         </div>
       )}
 
-      {data && !belgeNoControl  && 
+      {data && !belgeNoControl && (
         <div className=" min-h-screen bg-white p-4 md:p-8 gap-5">
           <div className="mx-auto max-w-4xl">
             <Button
@@ -275,9 +295,9 @@ export default function Page() {
           </div>
           <WorkPermitInfo data={data as QueryResponseType} />
         </div>
-      }
+      )}
 
-      {workPermitExemptionData && !belgeNoControl && 
+      {workPermitExemptionData && !belgeNoControl && (
         <div className=" min-h-screen bg-white p-4 md:p-8 gap-5">
           <div className="mx-auto max-w-4xl">
             <Button
@@ -292,9 +312,11 @@ export default function Page() {
               Yeni Sorgulama
             </Button>
           </div>
-          <WorkPermitExemption data={workPermitExemptionData as QueryResponseTypeExemption} />
+          <WorkPermitExemption
+            data={workPermitExemptionData as QueryResponseTypeExemption}
+          />
         </div>
-      }
+      )}
       {/* <div className=" min-h-screen bg-white p-4 md:p-8 gap-5">
         <div className="mx-auto max-w-4xl">
           <Button

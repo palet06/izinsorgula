@@ -1,14 +1,18 @@
-import { QueryResponseTypeExemption } from '@/lib/serveractions'
-import { Separator } from '@/components/ui/separator'
-import Image from 'next/image'
-import { format } from 'date-fns'
-import React from 'react'
-import { Card, CardHeader, CardTitle, CardContent } from '../ui/card'
+import { QueryResponseTypeExemption } from "@/lib/serveractions";
+import { Separator } from "@/components/ui/separator";
+import Image from "next/image";
+import { format } from "date-fns";
+import React from "react";
+import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
 
-const WorkPermitExemption = ({data}:{data:QueryResponseTypeExemption}) => {
+const WorkPermitExemption = ({
+  data,
+}: {
+  data: QueryResponseTypeExemption;
+}) => {
   return (
     <>
-    <Card className="mx-auto max-w-4xl overflow-hidden bg-[#F5F5F5] shadow-lg">
+      <Card className="mx-auto max-w-4xl overflow-hidden bg-[#F5F5F5] shadow-lg">
         <div className="p-6 md:p-8">
           {/* Header Section */}
           <div className="flex flex-col gap-6 items-center md:items-start md:flex-row">
@@ -88,9 +92,7 @@ const WorkPermitExemption = ({data}:{data:QueryResponseTypeExemption}) => {
             <Separator />
             <div className="grid grid-cols-2 gap-2">
               <div className="font-semibold">Muafiyet Türü</div>
-              <div>
-              {data.muafiyetTuru || "-"}
-              </div>
+              <div>{data.muafiyetTuru || "-"}</div>
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div className="font-semibold">Başlangıç Tarihi</div>
@@ -103,8 +105,7 @@ const WorkPermitExemption = ({data}:{data:QueryResponseTypeExemption}) => {
             <div className="grid grid-cols-2 gap-2">
               <div className="font-semibold">Bitiş Tarihi</div>
               <div>
-                {(data.bitisTarihi &&
-                  format(data.bitisTarihi, "dd.MM.yyyy")) ||
+                {(data.bitisTarihi && format(data.bitisTarihi, "dd.MM.yyyy")) ||
                   "-"}{" "}
               </div>
             </div>
@@ -118,17 +119,7 @@ const WorkPermitExemption = ({data}:{data:QueryResponseTypeExemption}) => {
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div className="font-semibold">Geçerlilik Durumu</div>
-              <div
-                className={`${
-                  data.gecerlilikDurumu.includes("Değerlendirme") &&
-                  "text-yellow-700"
-                } ${
-                  data.gecerlilikDurumu.includes("Sonlan") &&
-                  "text-[#DC0D15]"
-                }`}
-              >
-                {data.gecerlilikDurumu}
-              </div>
+              <div>{data.gecerlilikDurumu}</div>
             </div>
             <Separator />
             <div className="grid grid-cols-2 gap-2">
@@ -143,13 +134,11 @@ const WorkPermitExemption = ({data}:{data:QueryResponseTypeExemption}) => {
               <div className="font-semibold">Görev</div>
               <div>{data.meslek || "-"}</div>
             </div>
-            
-            
           </div>
         </CardContent>
       </Card>
     </>
-  )
-}
+  );
+};
 
-export default WorkPermitExemption
+export default WorkPermitExemption;
