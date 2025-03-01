@@ -23,7 +23,7 @@ export interface QueryResponseType {
   izinTuru: string;
   sonlandirmaTarihi: string;
   izingecerlilikdurum: string;
-  fotograf: string;
+  fotograf: string|null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   serhListesi: any[]; // Bu alanın tipi daha spesifik olarak belirlenebilir
 }
@@ -32,7 +32,7 @@ export interface QueryResponseTypeExemption {
   success: boolean;
   message: string;
   data: {
-    fotograf: string;
+    fotograf: string|null;
     ad: string;
     soyad: string;
     anaAdi: string;

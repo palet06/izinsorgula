@@ -3,6 +3,7 @@
 import ReCAPTCHA from "react-google-recaptcha";
 import { useUrlSearchParams } from "use-url-search-params";
 import { useIntl } from "react-intl";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -45,7 +46,7 @@ export default function Page() {
   const [yabanciKimlikNo, setYabanciKimlikNo] = useState("");
   const [captchaIsOk, setCaptchaIsOk] = useState(false);
   const [recaptchaToken, setCaptchaToken] = useState<string | null>(null);
-  const [captchaKey, setCaptchaKey] = useState(Date.now());
+  const [captchaKey, setCaptchaKey] = useState(Math.random());
 
   useEffect(() => {
     setBasvuruSecimi(
@@ -53,7 +54,7 @@ export default function Page() {
     );
     setBelgeNo((params.belgeNo || params.basvuruNo || "").toString());
     setYabanciKimlikNo((params.yabanciKimlikNo || "").toString());
-    setCaptchaKey(Date.now());
+    setCaptchaKey(Math.random());
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params, formatMessage({ id: "recaptcha.lang" })]);
@@ -100,7 +101,14 @@ export default function Page() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+    
+    if (!basvuruSecimi) {
+      toast(formatMessage({ id: "error.message.basvurutur" }), {
+        position: "top-center",
+        style: { color: "red", justifyContent: "center" },
+      });
+      return
+    }
     if (basvuruSecimi === "5") {
       axios
         .get(
@@ -108,14 +116,23 @@ export default function Page() {
         )
         .then((response) => {
           if (!response.data.data) {
-            console.log("Kayıt bulunamadı."); //toast yap
+            toast(formatMessage({ id: "error.message.kayitbulunamadi" }), {
+              position: "top-center",
+              style: { color: "red", justifyContent: "center" },
+            });
           } else {
-            console.log("Kayıt bulundu."); //toast yap
+            toast(formatMessage({ id: "error.message.kayitbulundu" }), {
+              position: "top-center",
+              duration: 1500,
+              style: { color: "green", justifyContent: "center" },
+              onAutoClose: () => {
+                setWorkPermitExemptionData(
+                  response.data as QueryResponseTypeExemption
+                );
+                setHasResult(true);
+              },
+            });
             console.log(response.data);
-            setWorkPermitExemptionData(
-              response.data as QueryResponseTypeExemption
-            );
-            setHasResult(true);
           }
         });
     } else if (basvuruSecimi === "6") {
@@ -124,15 +141,27 @@ export default function Page() {
           `https://emuafiyetapi.csgb.gov.tr/verifyMb?belgeNo=${belgeNo}&ykn=${yabanciKimlikNo}`
         );
 
-        if (!response.data) {
-          throw new Error("Veri alınamadı");
+        if (!response.data.data) {
+          toast(formatMessage({ id: "error.message.kayitbulunamadi" }), {
+            position: "top-center",
+            style: { color: "red", justifyContent: "center" },
+          });
+          return;
         }
-        console.log(response);
 
-        setWorkPermitExemptionData(
-          response.data.data as QueryResponseTypeExemption
-        );
-        setHasResult(true);
+        toast(formatMessage({ id: "error.message.kayitbulundu" }), {
+          position: "top-center",
+          duration: 1500,
+          style: { color: "green", justifyContent: "center" },
+          onAutoClose: () => {
+            setWorkPermitExemptionData(
+              response.data as QueryResponseTypeExemption
+            );
+            setHasResult(true);
+          },
+        });
+
+        console.log(response);
       } catch (error) {
         console.log(error);
       }
@@ -143,12 +172,23 @@ export default function Page() {
             .NEXT_PUBLIC_REMOTE_SERVER!}/api/izinSorgula/basvuruDTO?basvuruSecimi=${basvuruSecimi}&belgeNo=${belgeNo}&yabanciKimlikNo=${yabanciKimlikNo}&recaptchaToken=${recaptchaToken}`
         );
 
-        if (!response.data) {
-          throw new Error("Veri alınamadı");
+        if (!response.data.data) {
+          toast(formatMessage({ id: "error.message.kayitbulunamadi" }), {
+            position: "top-center",
+            style: { color: "red", justifyContent: "center" },
+          });
+          return;
         }
 
-        setData(response.data as QueryResponseType);
-        setHasResult(true);
+        toast(formatMessage({ id: "error.message.kayitbulundu" }), {
+          position: "top-center",
+          duration: 1500,
+          style: { color: "green", justifyContent: "center" },
+          onAutoClose: () => {
+            setData(response.data as QueryResponseType);
+            setHasResult(true);
+          },
+        });
       } catch (error) {
         console.log(error);
       }
@@ -158,12 +198,14 @@ export default function Page() {
   const handleCatpchaChange = (token: string | null) => {
     if (token) {
       setCaptchaToken(token);
+
       setCaptchaIsOk(true);
     }
   };
 
   function handleExpired() {
     setCaptchaIsOk(false);
+    setBelgeNoControl(true);
   }
 
   return (
@@ -196,24 +238,37 @@ export default function Page() {
                           <SelectTrigger className="bg-white text-left  flex items-center h-9 w-full  rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 ">
                             <SelectValue
                               className="text-left"
-                              placeholder="İzin Türü Seçiniz"
+                              placeholder={formatMessage({
+                                id: "sorgu.application.type",
+                              })}
                             />
                           </SelectTrigger>
 
                           <SelectContent className="!bg-white">
                             <SelectItem value="0">
-                              Çalışma İzni - e-İzin
+                              {formatMessage({ id: "sorgu.tur.calismaIzin" })}
                             </SelectItem>
                             <SelectItem value="5">
-                              Çalışma İzni Muafiyeti - e-Muafiyet
+                              {formatMessage({ id: "sorgu.tur.emuafiyet" })}
                             </SelectItem>
-                            <SelectItem value="2">Serbest Bölge</SelectItem>
+
+                            <SelectItem value="2">
+                              {formatMessage({
+                                id: "sorgu.tur.serbestBolgeIzin",
+                              })}
+                            </SelectItem>
                             <SelectItem value="1">
-                              GK/UK - Mevsimlik Tarım ve Hayvancılık Muafiyeti
+                              {formatMessage({
+                                id: "sorgu.tur.mevsimlikMuafiyet",
+                              })}
                             </SelectItem>
-                            <SelectItem value="4">Turkuaz Kart</SelectItem>
+                            <SelectItem value="4">
+                              {formatMessage({ id: "sorgu.tur.turkuaz" })}
+                            </SelectItem>
                             <SelectItem value="6">
-                              Muafiyet Bilgi Formu
+                              {formatMessage({
+                                id: "sorgu.tur.muafiyetBilgiFormu",
+                              })}
                             </SelectItem>
                           </SelectContent>
                         </Select>
@@ -301,7 +356,7 @@ export default function Page() {
               className="mb-4"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Yeni Sorgulama
+              {formatMessage({ id: "button.yenisorgu" })}
             </Button>
           </div>
           <WorkPermitInfo data={data as QueryResponseType} />
@@ -320,7 +375,7 @@ export default function Page() {
               className="mb-4"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Yeni Sorgulama
+              {formatMessage({ id: "button.yenisorgu" })}
             </Button>
           </div>
           <WorkPermitExemption

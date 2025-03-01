@@ -1,4 +1,4 @@
-
+import { Toaster } from "@/components/ui/sonner"
 import type { Metadata } from "next";
 import { Rubik } from "next/font/google";
 import "./globals.css";
@@ -30,6 +30,7 @@ export default function RootLayout({
     
       <body className={`${rubikFont.className}  antialiased bg-white`}>
         <AppWrapper>{children}</AppWrapper>
+        <Toaster />
       </body>
     </html>
   );

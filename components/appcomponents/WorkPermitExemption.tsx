@@ -4,12 +4,14 @@ import Image from "next/image";
 import { format } from "date-fns";
 import React from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
+import { useIntl } from "react-intl";
 
 const WorkPermitExemption = ({
   data,
 }: {
   data: QueryResponseTypeExemption;
 }) => {
+  const { formatMessage } = useIntl();
   return (
     <>
       <Card className="mx-auto max-w-4xl overflow-hidden bg-[#F5F5F5] shadow-lg">
@@ -37,7 +39,7 @@ const WorkPermitExemption = ({
                   </h1>
                   <p className="text-muted-foreground text-sm">
                     <span className="font-semibold text-black">
-                      Yabancı Kimlik Numarası :
+                      {formatMessage({ id: "kisi.yabTcNo"})} :
                     </span>{" "}
                     {data.data.ykn}
                   </p>
@@ -49,24 +51,26 @@ const WorkPermitExemption = ({
                 <div className="col-span-1 grid grid-cols-1 gap-2 md:grid-cols-2 ">
                   <div className="col-span-2">
                     <span className="font-semibold text-black">
-                      Doğum Tarihi :
+                      
+                      {formatMessage({ id: "kisi.dogumTarihi"})} :
+                      
                     </span>
                     {(data.data.dogumTarihi &&
                       format(data.data.dogumTarihi, "dd.MM.yyyy")) ||
                       "-"}
                   </div>
                   <div className="col-span-2">
-                    <span className="font-semibold text-black">Uyruk :</span>{" "}
+                    <span className="font-semibold text-black">{formatMessage({ id: "kisi.uyruk"})} :</span>{" "}
                     {data.data.uyruk}
                   </div>
                 </div>
                 <div className="col-span-1 grid grid-cols-1 gap-2 md:grid-cols-2">
                   <div className="col-span-2">
-                    <span className="font-semibold text-black">Baba Adı :</span>{" "}
+                    <span className="font-semibold text-black">{formatMessage({ id: "kisi.babaAd"})} :</span>{" "}
                     {data.data.babaAdi}
                   </div>
                   <div className="col-span-2">
-                    <span className="font-semibold text-black">Ana Adı :</span>{" "}
+                    <span className="font-semibold text-black">{formatMessage({ id: "kisi.anneAd"})} :</span>{" "}
                     {data.data.anaAdi}
                   </div>
                 </div>
@@ -79,23 +83,23 @@ const WorkPermitExemption = ({
       <Card className="mx-auto max-w-4xl overflow-hidden bg-[#F5F5F5] shadow-lg mt-5">
         <CardHeader>
           <CardTitle className="text-xl text-center">
-            Çalışma İzni Muafiyeti Bilgileri
+           {formatMessage({ id: "calismaIzniMuafiyetiBilgileri"})} 
           </CardTitle>
         </CardHeader>
         <Separator />
         <CardContent className="mt-5">
           <div className="grid gap-4">
             <div className="grid grid-cols-2 gap-2">
-              <div className="font-semibold">Başvuru Numarası</div>
+              <div className="font-semibold">{formatMessage({ id: "sorgu.belgeNo"})}</div>
               <div>{data.data.belgeNo || "-"}</div>
             </div>
             <Separator />
             <div className="grid grid-cols-2 gap-2">
-              <div className="font-semibold">Muafiyet Türü</div>
+              <div className="font-semibold">{formatMessage({ id: "muafiyet.workPermitExemptionType"})}</div>
               <div>{data.data.muafiyetTuru || "-"}</div>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              <div className="font-semibold">Başlangıç Tarihi</div>
+              <div className="font-semibold">{formatMessage({ id: "muafiyet.startDate"})}</div>
               <div>
                 {(data.data.baslangicTarihi &&
                   format(data.data.baslangicTarihi, "dd.MM.yyyy")) ||
@@ -103,14 +107,14 @@ const WorkPermitExemption = ({
               </div>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              <div className="font-semibold">Bitiş Tarihi</div>
+              <div className="font-semibold">{formatMessage({ id: "muafiyet.endDate"})}</div>
               <div>
                 {(data.data.bitisTarihi && format(data.data.bitisTarihi, "dd.MM.yyyy")) ||
                   "-"}{" "}
               </div>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              <div className="font-semibold">Sonlandırma Tarihi</div>
+              <div className="font-semibold">{formatMessage({ id: "muafiyet.terminationDate"})}</div>
               <div>
                 {(data.data.sonlandirmaTarihi &&
                   format(data.data.sonlandirmaTarihi, "dd.MM.yyyy")) ||
@@ -118,20 +122,20 @@ const WorkPermitExemption = ({
               </div>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              <div className="font-semibold">Geçerlilik Durumu</div>
+              <div className="font-semibold">{formatMessage({ id: "muafiyet.validityState"})}</div>
               <div>{data.data.gecerlilikDurumu}</div>
             </div>
             <Separator />
             <div className="grid grid-cols-2 gap-2">
-              <div className="font-semibold">İşyeri Unvanı</div>
+              <div className="font-semibold">{formatMessage({ id: "izin.companyTitle"})}</div>
               <div>{data.data.isyeriUnvani || "-"}</div>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              <div className="font-semibold">Yabancının Çalışma Adresi</div>
+              <div className="font-semibold">{formatMessage({ id: "izin.workingAddress"})}</div>
               <div>{data.data.calismaAdresi || "-"}</div>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              <div className="font-semibold">Görev</div>
+              <div className="font-semibold">{formatMessage({ id: "izin.position"})}</div>
               <div>{data.data.meslek || "-"}</div>
             </div>
           </div>

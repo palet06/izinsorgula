@@ -4,8 +4,10 @@ import React from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
 import Image from "next/image";
 import { QueryResponseType } from "@/lib/serveractions";
+import { useIntl } from "react-intl";
 
 const WorkPermitInfo = ({data}:{data:QueryResponseType}) => {
+  const { formatMessage } = useIntl();
   return (
     <>
       <Card className="mx-auto max-w-4xl overflow-hidden bg-[#F5F5F5] shadow-lg">
@@ -33,7 +35,8 @@ const WorkPermitInfo = ({data}:{data:QueryResponseType}) => {
                   </h1>
                   <p className="text-muted-foreground text-sm">
                     <span className="font-semibold text-black">
-                      Yabancı Kimlik Numarası :
+
+                      {formatMessage({ id: "kisi.yabTcNo"})} :
                     </span>{" "}
                     {data.tcYabKimlikNo}
                   </p>
@@ -45,24 +48,24 @@ const WorkPermitInfo = ({data}:{data:QueryResponseType}) => {
                 <div className="col-span-1 grid grid-cols-1 gap-2 md:grid-cols-2 ">
                   <div className="col-span-2">
                     <span className="font-semibold text-black">
-                      Doğum Tarihi :
+                    {formatMessage({ id: "kisi.dogumTarihi"})} :
                     </span>
                     {(data.dogumTarihi &&
                       format(data.dogumTarihi, "dd.MM.yyyy")) ||
                       "-"}
                   </div>
                   <div className="col-span-2">
-                    <span className="font-semibold text-black">Uyruk :</span>{" "}
+                    <span className="font-semibold text-black">{formatMessage({ id: "kisi.uyruk"})} :</span>{" "}
                     {data.uyruk}
                   </div>
                 </div>
                 <div className="col-span-1 grid grid-cols-1 gap-2 md:grid-cols-2">
                   <div className="col-span-2">
-                    <span className="font-semibold text-black">Baba Adı :</span>{" "}
+                    <span className="font-semibold text-black">{formatMessage({ id: "kisi.babaAd"})} :</span>{" "}
                     {data.babaAdi}
                   </div>
                   <div className="col-span-2">
-                    <span className="font-semibold text-black">Ana Adı :</span>{" "}
+                    <span className="font-semibold text-black">{formatMessage({ id: "kisi.anneAd"})} :</span>{" "}
                     {data.anaAdi}
                   </div>
                 </div>
@@ -75,19 +78,21 @@ const WorkPermitInfo = ({data}:{data:QueryResponseType}) => {
       <Card className="mx-auto max-w-4xl overflow-hidden bg-[#F5F5F5] shadow-lg mt-5">
         <CardHeader>
           <CardTitle className="text-xl text-center">
-            Çalışma İzni Bilgileri
+          {formatMessage({ id: "calismaIzniBilgileri"})}
+          
+            
           </CardTitle>
         </CardHeader>
         <Separator />
         <CardContent className="mt-5">
           <div className="grid gap-4">
             <div className="grid grid-cols-2 gap-2">
-              <div className="font-semibold">Çalışma İzni Türü</div>
+              <div className="font-semibold">{formatMessage({ id: "izin.workPermitType"})}</div>
               <div>{data.izinTuru || "-"}</div>
             </div>
             <Separator />
             <div className="grid grid-cols-2 gap-2">
-              <div className="font-semibold">Veriliş Tarihi</div>
+              <div className="font-semibold">{formatMessage({ id: "izin.issueDate"})}</div>
               <div>
                 {(data.verilisTarihi &&
                   format(data.verilisTarihi, "dd.MM.yyyy")) ||
@@ -95,7 +100,7 @@ const WorkPermitInfo = ({data}:{data:QueryResponseType}) => {
               </div>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              <div className="font-semibold">İzin Başlangıç Tarihi</div>
+              <div className="font-semibold">{formatMessage({ id: "izin.startDate"})}</div>
               <div>
                 {(data.izinBasTarihi &&
                   format(data.izinBasTarihi, "dd.MM.yyyy")) ||
@@ -103,7 +108,7 @@ const WorkPermitInfo = ({data}:{data:QueryResponseType}) => {
               </div>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              <div className="font-semibold">İzin Bitiş Tarihi</div>
+              <div className="font-semibold">{formatMessage({ id: "izin.endDate"})}</div>
               <div>
                 {(data.izinBitTarihi &&
                   format(data.izinBitTarihi, "dd.MM.yyyy")) ||
@@ -111,7 +116,7 @@ const WorkPermitInfo = ({data}:{data:QueryResponseType}) => {
               </div>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              <div className="font-semibold">İzin Sonlandırma Tarihi</div>
+              <div className="font-semibold">{formatMessage({ id: "izin.terminationDate"})}</div>
               <div>
                 {(data.sonlandirmaTarihi &&
                   format(data.sonlandirmaTarihi, "dd.MM.yyyy")) ||
@@ -119,7 +124,7 @@ const WorkPermitInfo = ({data}:{data:QueryResponseType}) => {
               </div>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              <div className="font-semibold">İzin Geçerlilik Durum</div>
+              <div className="font-semibold">{formatMessage({ id: "izin.validityState"})}</div>
               <div
                 className={`${
                   data.izingecerlilikdurum.includes("Değerlendirme") &&
@@ -134,23 +139,23 @@ const WorkPermitInfo = ({data}:{data:QueryResponseType}) => {
             </div>
             <Separator />
             <div className="grid grid-cols-2 gap-2">
-              <div className="font-semibold">İşyeri Unvanı</div>
+              <div className="font-semibold">{formatMessage({ id: "izin.companyTitle"})}</div>
               <div>{data.adUnvan || "-"}</div>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              <div className="font-semibold">Yabancının Çalışma Adresi</div>
+              <div className="font-semibold">{formatMessage({ id: "izin.workingAddress"})}</div>
               <div>{data.sirketAdres || "-"}</div>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              <div className="font-semibold">Görev</div>
+              <div className="font-semibold">{formatMessage({ id: "izin.position"})}</div>
               <div>{data.gorev || "-"}</div>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              <div className="font-semibold">Maaş</div>
+              <div className="font-semibold">{formatMessage({ id: "izin.salary"})}</div>
               <div>{(data.ucret && data.ucret) || "-"}</div>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              <div className="font-semibold">Şerhler</div>
+              <div className="font-semibold">{formatMessage({ id: "izin.objections"})}</div>
               <div>
                 {(data.serhListesi.length > 0 && (
                   <ul>
