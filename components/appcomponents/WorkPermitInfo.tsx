@@ -1,13 +1,38 @@
 import { Separator } from "@radix-ui/react-dropdown-menu";
 import { format } from "date-fns";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
 import Image from "next/image";
 import { QueryResponseType } from "@/lib/serveractions";
 import { useIntl } from "react-intl";
+import { Warning } from "./Warning";
 
-const WorkPermitInfo = ({data}:{data:QueryResponseType}) => {
+const WorkPermitInfo = ({ data }: { data: QueryResponseType }) => {
   const { formatMessage } = useIntl();
+  const [isAlertDialogOpen, setIsAlertDialogOpen] = useState<boolean>(false);
+  const [alertDialogMessage,setAlertDialogMessage] = useState<string>("");
+  const closeDialog = ()=> {
+    setIsAlertDialogOpen(false)
+  }
+  useEffect(() => {
+    if (data.serhListesi) {
+      if (typeof data.serhListesi === "string") {
+        setIsAlertDialogOpen(true);
+        setAlertDialogMessage(" DİKKAT! Bu izin şerhli olarak düzenlenmiştir.")
+      } else if (
+        Array.isArray(data.serhListesi) &&
+        data.serhListesi.length > 0
+      ) {
+        setIsAlertDialogOpen(true);
+        setAlertDialogMessage(" DİKKAT! Bu izin şerhli olarak düzenlenmiştir.")
+      }
+    }
+
+    if(data.durum ===32) {
+      setAlertDialogMessage("Çalışma izni resen iptal edilerek hükümsüz kılınmıştır.")
+    }
+  }, []);
+
   return (
     <>
       <Card className="mx-auto max-w-4xl overflow-hidden bg-[#F5F5F5] shadow-lg">
@@ -35,8 +60,7 @@ const WorkPermitInfo = ({data}:{data:QueryResponseType}) => {
                   </h1>
                   <p className="text-muted-foreground text-sm">
                     <span className="font-semibold text-black">
-
-                      {formatMessage({ id: "kisi.yabTcNo"})} :
+                      {formatMessage({ id: "kisi.yabTcNo" })} :
                     </span>{" "}
                     {data.tcYabKimlikNo}
                   </p>
@@ -48,24 +72,30 @@ const WorkPermitInfo = ({data}:{data:QueryResponseType}) => {
                 <div className="col-span-1 grid grid-cols-1 gap-2 md:grid-cols-2 ">
                   <div className="col-span-2">
                     <span className="font-semibold text-black">
-                    {formatMessage({ id: "kisi.dogumTarihi"})} :
+                      {formatMessage({ id: "kisi.dogumTarihi" })} :
                     </span>
                     {(data.dogumTarihi &&
                       format(data.dogumTarihi, "dd.MM.yyyy")) ||
                       "-"}
                   </div>
                   <div className="col-span-2">
-                    <span className="font-semibold text-black">{formatMessage({ id: "kisi.uyruk"})} :</span>{" "}
+                    <span className="font-semibold text-black">
+                      {formatMessage({ id: "kisi.uyruk" })} :
+                    </span>{" "}
                     {data.uyruk}
                   </div>
                 </div>
                 <div className="col-span-1 grid grid-cols-1 gap-2 md:grid-cols-2">
                   <div className="col-span-2">
-                    <span className="font-semibold text-black">{formatMessage({ id: "kisi.babaAd"})} :</span>{" "}
+                    <span className="font-semibold text-black">
+                      {formatMessage({ id: "kisi.babaAd" })} :
+                    </span>{" "}
                     {data.babaAdi}
                   </div>
                   <div className="col-span-2">
-                    <span className="font-semibold text-black">{formatMessage({ id: "kisi.anneAd"})} :</span>{" "}
+                    <span className="font-semibold text-black">
+                      {formatMessage({ id: "kisi.anneAd" })} :
+                    </span>{" "}
                     {data.anaAdi}
                   </div>
                 </div>
@@ -78,21 +108,23 @@ const WorkPermitInfo = ({data}:{data:QueryResponseType}) => {
       <Card className="mx-auto max-w-4xl overflow-hidden bg-[#F5F5F5] shadow-lg mt-5">
         <CardHeader>
           <CardTitle className="text-xl text-center">
-          {formatMessage({ id: "calismaIzniBilgileri"})}
-          
-            
+            {formatMessage({ id: "calismaIzniBilgileri" })}
           </CardTitle>
         </CardHeader>
         <Separator />
         <CardContent className="mt-5">
           <div className="grid gap-4">
             <div className="grid grid-cols-2 gap-2">
-              <div className="font-semibold">{formatMessage({ id: "izin.workPermitType"})}</div>
+              <div className="font-semibold">
+                {formatMessage({ id: "izin.workPermitType" })}
+              </div>
               <div>{data.izinTuru || "-"}</div>
             </div>
             <Separator />
             <div className="grid grid-cols-2 gap-2">
-              <div className="font-semibold">{formatMessage({ id: "izin.issueDate"})}</div>
+              <div className="font-semibold">
+                {formatMessage({ id: "izin.issueDate" })}
+              </div>
               <div>
                 {(data.verilisTarihi &&
                   format(data.verilisTarihi, "dd.MM.yyyy")) ||
@@ -100,7 +132,9 @@ const WorkPermitInfo = ({data}:{data:QueryResponseType}) => {
               </div>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              <div className="font-semibold">{formatMessage({ id: "izin.startDate"})}</div>
+              <div className="font-semibold">
+                {formatMessage({ id: "izin.startDate" })}
+              </div>
               <div>
                 {(data.izinBasTarihi &&
                   format(data.izinBasTarihi, "dd.MM.yyyy")) ||
@@ -108,7 +142,9 @@ const WorkPermitInfo = ({data}:{data:QueryResponseType}) => {
               </div>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              <div className="font-semibold">{formatMessage({ id: "izin.endDate"})}</div>
+              <div className="font-semibold">
+                {formatMessage({ id: "izin.endDate" })}
+              </div>
               <div>
                 {(data.izinBitTarihi &&
                   format(data.izinBitTarihi, "dd.MM.yyyy")) ||
@@ -116,7 +152,9 @@ const WorkPermitInfo = ({data}:{data:QueryResponseType}) => {
               </div>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              <div className="font-semibold">{formatMessage({ id: "izin.terminationDate"})}</div>
+              <div className="font-semibold">
+                {formatMessage({ id: "izin.terminationDate" })}
+              </div>
               <div>
                 {(data.sonlandirmaTarihi &&
                   format(data.sonlandirmaTarihi, "dd.MM.yyyy")) ||
@@ -124,7 +162,9 @@ const WorkPermitInfo = ({data}:{data:QueryResponseType}) => {
               </div>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              <div className="font-semibold">{formatMessage({ id: "izin.validityState"})}</div>
+              <div className="font-semibold">
+                {formatMessage({ id: "izin.validityState" })}
+              </div>
               <div
                 className={`${
                   data.izingecerlilikdurum.includes("Değerlendirme") &&
@@ -139,37 +179,55 @@ const WorkPermitInfo = ({data}:{data:QueryResponseType}) => {
             </div>
             <Separator />
             <div className="grid grid-cols-2 gap-2">
-              <div className="font-semibold">{formatMessage({ id: "izin.companyTitle"})}</div>
+              <div className="font-semibold">
+                {formatMessage({ id: "izin.companyTitle" })}
+              </div>
               <div>{data.adUnvan || "-"}</div>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              <div className="font-semibold">{formatMessage({ id: "izin.workingAddress"})}</div>
+              <div className="font-semibold">
+                {formatMessage({ id: "izin.workingAddress" })}
+              </div>
               <div>{data.sirketAdres || "-"}</div>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              <div className="font-semibold">{formatMessage({ id: "izin.position"})}</div>
+              <div className="font-semibold">
+                {formatMessage({ id: "izin.position" })}
+              </div>
               <div>{data.gorev || "-"}</div>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              <div className="font-semibold">{formatMessage({ id: "izin.salary"})}</div>
+              <div className="font-semibold">
+                {formatMessage({ id: "izin.salary" })}
+              </div>
               <div>{(data.ucret && data.ucret) || "-"}</div>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              <div className="font-semibold">{formatMessage({ id: "izin.objections"})}</div>
+              <div className="font-semibold">
+                {formatMessage({ id: "izin.objections" })}
+              </div>
               <div>
-                {(data.serhListesi.length > 0 && (
+                {typeof data.serhListesi === "string" && (
                   <ul>
-                    {data.serhListesi.map((serh, i) => (
+                    <li>{data.serhListesi}</li>
+                  </ul>
+                )}
+                {Array.isArray(data.serhListesi) &&
+                data.serhListesi.length > 0 ? (
+                  <ul>
+                    {data.serhListesi.map((serh: string, i: number) => (
                       <li key={i}>{serh}</li>
                     ))}
                   </ul>
-                )) ||
-                  "-"}
+                ) : (
+                  "-"
+                )}
               </div>
             </div>
           </div>
         </CardContent>
       </Card>
+      <Warning isAlertDialogOpen={isAlertDialogOpen} dialogMessage={alertDialogMessage} closeDialog={closeDialog}/>
     </>
   );
 };

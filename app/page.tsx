@@ -59,7 +59,7 @@ export default function Page() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params, formatMessage({ id: "recaptcha.lang" })]);
 
-  const disabledBasvuruNoList = ["1", "2"];
+  const disabledBasvuruNoList = ["1"];
   const captchaRef = useRef<ReCAPTCHA | null>(null);
 
   const clearForm = () => {
@@ -101,13 +101,13 @@ export default function Page() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     if (!basvuruSecimi) {
       toast(formatMessage({ id: "error.message.basvurutur" }), {
         position: "top-center",
         style: { color: "red", justifyContent: "center" },
       });
-      return
+      return;
     }
     if (basvuruSecimi === "5") {
       axios
@@ -172,7 +172,7 @@ export default function Page() {
             .NEXT_PUBLIC_REMOTE_SERVER!}/api/izinSorgula/basvuruDTO?basvuruSecimi=${basvuruSecimi}&belgeNo=${belgeNo}&yabanciKimlikNo=${yabanciKimlikNo}&recaptchaToken=${recaptchaToken}`
         );
 
-        if (!response.data.data) {
+        if (!response.data) {
           toast(formatMessage({ id: "error.message.kayitbulunamadi" }), {
             position: "top-center",
             style: { color: "red", justifyContent: "center" },
@@ -344,7 +344,7 @@ export default function Page() {
         </div>
       )}
 
-      {data && !belgeNoControl && (
+      {data && (
         <div className=" min-h-screen bg-white p-4 md:p-8 gap-5">
           <div className="mx-auto max-w-4xl">
             <Button
@@ -363,7 +363,7 @@ export default function Page() {
         </div>
       )}
 
-      {workPermitExemptionData && !belgeNoControl && (
+      {workPermitExemptionData && (
         <div className=" min-h-screen bg-white p-4 md:p-8 gap-5">
           <div className="mx-auto max-w-4xl">
             <Button
