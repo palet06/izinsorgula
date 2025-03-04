@@ -1,5 +1,7 @@
 {
     "recaptcha.lang":"en",
+    "warning.objections":"ATTENTION! This permit is issued with annotations.",
+    "warning.cancelled":"The work permit has been cancelled ex officio and rendered invalid.",
     "error.message.basvurutur":"❌ Please select application type",
     "error.message.kayitbulunamadi":"❌ No record found",
     "error.message.kayitbulundu":"✅ Record found.",

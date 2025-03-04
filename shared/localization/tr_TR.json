@@ -1,5 +1,7 @@
 {
     "recaptcha.lang":"tr",
+    "warning.objections":"DİKKAT! Bu izin şerhli olarak düzenlenmiştir.",
+    "warning.cancelled":"Çalışma izni resen iptal edilerek hükümsüz kılınmıştır.",
     "error.message.basvurutur":"❌ Lütfen başvuru türünü seçiniz.",
     "error.message.kayitbulunamadi":"❌ Kayıt bulunamadı.",
     "error.message.kayitbulundu":"✅ Kayıt bulundu.",

@@ -18,18 +18,18 @@ const WorkPermitInfo = ({ data }: { data: QueryResponseType }) => {
     if (data.serhListesi) {
       if (typeof data.serhListesi === "string") {
         setIsAlertDialogOpen(true);
-        setAlertDialogMessage(" DİKKAT! Bu izin şerhli olarak düzenlenmiştir.")
+        setAlertDialogMessage(formatMessage({ id: "warning.objections" }))
       } else if (
         Array.isArray(data.serhListesi) &&
         data.serhListesi.length > 0
       ) {
         setIsAlertDialogOpen(true);
-        setAlertDialogMessage(" DİKKAT! Bu izin şerhli olarak düzenlenmiştir.")
+        setAlertDialogMessage(formatMessage({ id: "warning.objections" }))
       }
     }
 
     if(data.durum ===32) {
-      setAlertDialogMessage("Çalışma izni resen iptal edilerek hükümsüz kılınmıştır.")
+      setAlertDialogMessage(formatMessage({ id: "warning.cancelled" }))
     }
   }, []);
 
