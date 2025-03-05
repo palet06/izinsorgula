@@ -9,6 +9,22 @@ export default {
   ],
   theme: {
   	extend: {
+		animation: {
+			'spin-slow': 'spin 3s linear infinite',
+			'fade-in': 'fadeIn 2s ease-out',
+			'bounce-slow': 'bounce 2s infinite'
+		  },
+		  keyframes: {
+			fadeIn: {
+			  '0%': { opacity: '0' },
+			  '100%': { opacity: '1' }
+			},
+			
+			bounce: {
+			  '0%, 100%': { transform: 'translateY(0)' },
+			  '50%': { transform: 'translateY(-1rem)' }
+			}
+		  },
 		screens: {
 			'sm': '640px',
 			// => @media (min-width: 640px) { ... }

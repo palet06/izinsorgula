@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-require-imports */
 "use client";
 
 import ReCAPTCHA from "react-google-recaptcha";
@@ -29,7 +31,7 @@ import {
   QueryResponseTypeExemption,
 } from "@/lib/serveractions";
 import axios from "axios";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Download } from "lucide-react";
 import WorkPermitInfo from "@/components/appcomponents/WorkPermitInfo";
 import WorkPermitExemption from "@/components/appcomponents/WorkPermitExemption";
 
@@ -208,15 +210,32 @@ export default function Page() {
     setBelgeNoControl(true);
   }
 
+  const handleDownloadPDF = () => {
+    const opt = {
+      margin: 0.3,
+      filename: `${
+        data?.tcYabKimlikNo ||
+        workPermitExemptionData?.data.ykn ||
+        "izinbilgileri"
+      }.pdf`,
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
+    };
+    const element = document.getElementById("pdf");
+    const html2pdf = require("html2pdf.js") as any;
+    html2pdf().from(element).set(opt).save();
+  };
+
   return (
     <>
       {!hasResult && (
-        <div className="flex  w-full items-center justify-center p-6 md:p-10 ">
-          <div className="w-full max-w-sm  shadow-lg ">
+        <div className="flex  w-full items-center justify-center p-6 md:p-10 animate-fade-in">
+          <div className="w-full max-w-md  shadow-lg ">
             <div className={cn("flex flex-col gap-6 ")}>
               <Card className="bg-[#F5F5F5]">
                 <CardHeader>
-                  <CardDescription className="text-center font-semibold text-black ">
+                  <CardDescription className="text-center font-semibold text-black tracking-[0.07rem] ">
                     {formatMessage({ id: "site.name" })}
                   </CardDescription>
                   <Separator />
@@ -308,7 +327,7 @@ export default function Page() {
                         <div className="flex items-center justify-center">
                           <ReCAPTCHA
                             key={captchaKey}
-                            className="transform scale-110"
+                            className="transform"
                             hl={formatMessage({ id: "recaptcha.lang" })}
                             ref={captchaRef}
                             sitekey={
@@ -346,7 +365,34 @@ export default function Page() {
 
       {data && (
         <div className=" min-h-screen bg-white p-4 md:p-8 gap-5">
-          <div className="mx-auto max-w-4xl">
+          <div className="mx-auto max-w-4xl flex flex-row items-center justify-between sm:justify-start gap-3">
+            <Button
+              onClick={() => {
+                setHasResult(false);
+                clearForm();
+              }}
+              variant="ghost"
+              className="mb-4 border"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              {formatMessage({ id: "button.yenisorgu" })}
+            </Button>
+            <Button
+              onClick={handleDownloadPDF}
+              variant="ghost"
+              className="mb-4 border"
+            >
+              <Download className="mr-2 h-4 w-4" />
+              {formatMessage({ id: "button.pdf" })}
+            </Button>
+          </div>
+          <WorkPermitInfo data={data as QueryResponseType} />
+        </div>
+      )}
+
+      {workPermitExemptionData && (
+        <div className=" min-h-screen bg-white p-4 md:p-8 gap-5">
+          <div className="mx-auto max-w-4xl flex flex-row items-center justify-between sm:justify-start gap-3">
             <Button
               onClick={() => {
                 setHasResult(false);
@@ -358,24 +404,13 @@ export default function Page() {
               <ArrowLeft className="mr-2 h-4 w-4" />
               {formatMessage({ id: "button.yenisorgu" })}
             </Button>
-          </div>
-          <WorkPermitInfo data={data as QueryResponseType} />
-        </div>
-      )}
-
-      {workPermitExemptionData && (
-        <div className=" min-h-screen bg-white p-4 md:p-8 gap-5">
-          <div className="mx-auto max-w-4xl">
             <Button
-              onClick={() => {
-                setHasResult(false);
-                clearForm();
-              }}
+              onClick={handleDownloadPDF}
               variant="ghost"
               className="mb-4"
             >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              {formatMessage({ id: "button.yenisorgu" })}
+              <Download className="mr-2 h-4 w-4" />
+              {formatMessage({ id: "button.pdf" })}
             </Button>
           </div>
           <WorkPermitExemption

@@ -34,7 +34,7 @@ const WorkPermitInfo = ({ data }: { data: QueryResponseType }) => {
   }, []);
 
   return (
-    <>
+    <div id="pdf">
       <Card className="mx-auto max-w-4xl overflow-hidden bg-[#F5F5F5] shadow-lg">
         <div className="p-6 md:p-8">
           {/* Header Section */}
@@ -228,7 +228,7 @@ const WorkPermitInfo = ({ data }: { data: QueryResponseType }) => {
         </CardContent>
       </Card>
       <Warning isAlertDialogOpen={isAlertDialogOpen} dialogMessage={alertDialogMessage} closeDialog={closeDialog}/>
-    </>
+    </div>
   );
 };
 

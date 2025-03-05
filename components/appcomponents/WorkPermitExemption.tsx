@@ -13,7 +13,7 @@ const WorkPermitExemption = ({
 }) => {
   const { formatMessage } = useIntl();
   return (
-    <>
+    <div id="pdf">
       <Card className="mx-auto max-w-4xl overflow-hidden bg-[#F5F5F5] shadow-lg">
         <div className="p-6 md:p-8">
           {/* Header Section */}
@@ -141,7 +141,7 @@ const WorkPermitExemption = ({
           </div>
         </CardContent>
       </Card>
-    </>
+    </div>
   );
 };
 
