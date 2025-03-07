@@ -114,7 +114,7 @@ export default function Page() {
     if (basvuruSecimi === "5") {
       axios
         .get(
-          `https://emuafiyetapi.csgb.gov.tr/verifyExemption?belgeNo=${belgeNo}&ykn=${yabanciKimlikNo}`
+          `${process.env.NEXT_PUBLIC_REMOTE_SERVER_MUAFIYET}/verifyExemption?belgeNo=${belgeNo}&ykn=${yabanciKimlikNo}`
         )
         .then((response) => {
           if (!response.data.data) {
@@ -140,7 +140,7 @@ export default function Page() {
     } else if (basvuruSecimi === "6") {
       try {
         const response = await axios.get(
-          `https://emuafiyetapi.csgb.gov.tr/verifyMb?belgeNo=${belgeNo}&ykn=${yabanciKimlikNo}`
+          `${process.env.NEXT_PUBLIC_REMOTE_SERVER_MUAFIYET}/verifyMb?belgeNo=${belgeNo}&ykn=${yabanciKimlikNo}`
         );
 
         if (!response.data.data) {
@@ -170,8 +170,7 @@ export default function Page() {
     } else {
       try {
         const response = await axios.get(
-          `${process.env
-            .NEXT_PUBLIC_REMOTE_SERVER!}/api/izinSorgula/basvuruDTO?basvuruSecimi=${basvuruSecimi}&belgeNo=${belgeNo}&yabanciKimlikNo=${yabanciKimlikNo}&recaptchaToken=${recaptchaToken}`
+          `${process.env.NEXT_PUBLIC_REMOTE_SERVER}/api/izinSorgula/basvuruDTO?basvuruSecimi=${basvuruSecimi}&belgeNo=${belgeNo}&yabanciKimlikNo=${yabanciKimlikNo}&recaptchaToken=${recaptchaToken}`
         );
 
         if (!response.data) {
@@ -210,22 +209,22 @@ export default function Page() {
     setBelgeNoControl(true);
   }
 
-  const handleDownloadPDF = () => {
-    const opt = {
-      margin: 0.3,
-      filename: `${
-        data?.tcYabKimlikNo ||
-        workPermitExemptionData?.data.ykn ||
-        "izinbilgileri"
-      }.pdf`,
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
-    };
-    const element = document.getElementById("pdf");
-    const html2pdf = require("html2pdf.js") as any;
-    html2pdf().from(element).set(opt).save();
-  };
+  // const handleDownloadPDF = () => {
+  //   const opt = {
+  //     margin: 0.3,
+  //     filename: `${
+  //       data?.tcYabKimlikNo ||
+  //       workPermitExemptionData?.data.ykn ||
+  //       "izinbilgileri"
+  //     }.pdf`,
+  //     image: { type: "jpeg", quality: 0.98 },
+  //     html2canvas: { scale: 2 },
+  //     jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
+  //   };
+  //   const element = document.getElementById("pdf");
+  //   const html2pdf = require("html2pdf.js") as any;
+  //   html2pdf().from(element).set(opt).save();
+  // };
 
   return (
     <>
@@ -377,14 +376,14 @@ export default function Page() {
               <ArrowLeft className="mr-2 h-4 w-4" />
               {formatMessage({ id: "button.yenisorgu" })}
             </Button>
-            <Button
+            {/* <Button
               onClick={handleDownloadPDF}
               variant="ghost"
               className="mb-4 border"
             >
               <Download className="mr-2 h-4 w-4" />
               {formatMessage({ id: "button.pdf" })}
-            </Button>
+            </Button> */}
           </div>
           <WorkPermitInfo data={data as QueryResponseType} />
         </div>
@@ -404,14 +403,14 @@ export default function Page() {
               <ArrowLeft className="mr-2 h-4 w-4" />
               {formatMessage({ id: "button.yenisorgu" })}
             </Button>
-            <Button
+            {/* <Button
               onClick={handleDownloadPDF}
               variant="ghost"
               className="mb-4"
             >
               <Download className="mr-2 h-4 w-4" />
               {formatMessage({ id: "button.pdf" })}
-            </Button>
+            </Button> */}
           </div>
           <WorkPermitExemption
             data={workPermitExemptionData as QueryResponseTypeExemption}
